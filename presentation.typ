@@ -22,21 +22,21 @@
 // Use #polylux-slide to create a slide and style it using your favourite Typst functions
 #polylux-slide[
   #align(horizon + center)[
-    = VectorFusion: Text-to-SVG by Abstracting Pixel-Based Diffusion Models
-    \ CVPR 2023
+    = Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware
+    \ RSS 2023
 
     양현서
 
-    May 31, 2024
+    July 12, 2024
   ]
 ]
 
 #polylux-slide[
   ==  About
 
-  - Author: Ajay Jain, Amber Xie, and Pieter Abbeel from UC Berkeley
+  - Author: Tony Z. Zhao, Vikash Kumar, Sergey Levine, Chelsea Finn
 
-  - Conference: CVPR 2023 
+  - Conference: RSS 2023 
 ]
 
 #polylux-slide[
@@ -134,15 +134,15 @@
   #box(width: 100%, height: 87%,
  columns(2, gutter: 0pt)[
    #set par(justify: true)
-   #figure(
-    image("images/svg_param.png", height: 100%),
-   )
+  //  #figure(
+  //   image("images/svg_param.png", height: 100%),
+  //  )
    #colbreak()
    - $s$: number of segments
    - $n$: number of paths to add
-   #figure(
-    image("images/gradient.svg", height: 100%),
-   )
+  //  #figure(
+  //   image("images/gradient.svg", height: 100%),
+  //  )
  ]
 )
 ]
@@ -341,12 +341,12 @@
 
 #polylux-slide[
   == VectorFusion: Architecture
-  #figure(
-  image("images/architecture.png", width: 100%),
-  caption: [
-    VectorFusion architecture
-  ]
-)
+//   #figure(
+//   image("images/architecture.png", width: 100%),
+//   caption: [
+//     VectorFusion architecture
+//   ]
+// )
 ]
 
 #polylux-slide[
@@ -381,9 +381,9 @@
   #box(width: 100%, height: 87%,
  columns(2, gutter: 0pt)[
    #set par(justify: true)
-   #figure(
-    image("images/eval.png", width: 100%),
-   )
+  //  #figure(
+  //   image("images/eval.png", width: 100%),
+  //  )
    #colbreak()
    - CLIPDraw _performed best_, but *qualitative results are poor*
    - Therefore, also use OpenCLIP score
@@ -406,20 +406,20 @@
 
 #polylux-slide[
   == Qualitative Results
-  #figure(
-  image("images/results.png", width: 100%),
-//   #table(
-//   columns:(auto, 1fr, 1fr), 
-//   table.vline(x: 1, start: 0),
-//   table.hline(y: 1, start: 0),
-//   inset:(10pt),
-//   fill:color.yellow.lighten(85%),
-//   table.header[][Multimodal][Recurrent],
-//  [kcc-husk-vision-dqn], [X], [X],
-//  [kcc-husk-bimodal-dqn-final], [O], [X],
-//  [kcc-husk-vision-drqn-final], [X], [O],
-//  [kcc-husk-bimodal-drqn-final], [O], [O],
-)
+//   #figure(
+//   image("images/results.png", width: 100%),
+// //   #table(
+// //   columns:(auto, 1fr, 1fr), 
+// //   table.vline(x: 1, start: 0),
+// //   table.hline(y: 1, start: 0),
+// //   inset:(10pt),
+// //   fill:color.yellow.lighten(85%),
+// //   table.header[][Multimodal][Recurrent],
+// //  [kcc-husk-vision-dqn], [X], [X],
+// //  [kcc-husk-bimodal-dqn-final], [O], [X],
+// //  [kcc-husk-vision-drqn-final], [X], [O],
+// //  [kcc-husk-bimodal-drqn-final], [O], [O],
+// )
 ]
 
 #polylux-slide[
