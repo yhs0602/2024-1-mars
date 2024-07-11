@@ -4,7 +4,7 @@
 // Make the paper dimensions fit for a presentation and the text larger
 #set page(
   paper: "presentation-16-9",
-  fill: rgb(255, 253, 235)
+  fill: rgb(235, 253, 255)
 )
 #set text(
 	size: 25pt,
@@ -56,7 +56,7 @@
         tight: true,
         [precision],
         [careful coordination of contact forces],
-        [closed-loop visual feedback],  
+        [closed-loop visual feedback]  
       )
 
     ]
@@ -79,15 +79,6 @@
 ]
 
 #polylux-slide[
-  == Challenges in Imitation Learning
-    #list(
-    tight: false,
-    [*Errors* in the policy can compound over time #pause],
-    [Human demonstrations can be *non-stationary*]
-  )
-]
-
-#polylux-slide[
   == Introduction
   #list(
     tight: true,
@@ -97,8 +88,8 @@
     [Key contributions:
       #list(
         tight: true,
-        [Low-cost hardware setup],
-        [Novel imitation learning algorithm (ACT)],
+        [*Low-cost* hardware setup],
+        [Novel imitation learning algorithm *(ACT)*],
         [Successful demonstration on various tasks]
       )
     ]
@@ -110,8 +101,8 @@
   #list(
     tight: false,
     [ViperX 6-DoF robot arms],
-    [3D printed components],
-    [Cost: <\$20k]
+    [3D printed “see-through” fingers, gripping tape],
+    [*Cost: <\$20k*]
   )
 ]
 
@@ -120,9 +111,9 @@
   == System Design - Design principles
   #list(
     tight: false,
-    [Versatile],
-    [User-friendly],
-    [Repairable],
+    [Versatile #pause],
+    [User-friendly #pause],
+    [Repairable #pause],
     [Easy-to-build]
   )  
 ]
@@ -134,7 +125,6 @@
     tight: false,
     [Joint-space mapping for control],
     [High-frequency control (50Hz)],
-    [3D printed “see-through” fingers, gripping tape]
   )
 ]
 
@@ -149,6 +139,7 @@
 
 #polylux-slide[
   == Imitation Learning Algorithm
+  #pause
   #list(
     tight: false,
     [*Challenges*:
@@ -156,7 +147,7 @@
         tight: true,
         [Compounding errors in policy],
         [Non-stationary human demonstrations]
-      )
+      ) #pause
     ],
     [*Solution: Action Chunking with Transformers (ACT)*:
       #list(
@@ -173,10 +164,10 @@
   == Training ACT on a New Task
   #list(
     tight: false,
-    [Record leader joint positions as actions],
-    [Observations: follower joint positions, 4 camera feeds],
-    [Train ACT: predict future actions from observations],
-    [Test: use policy with lowest validation loss],
+    [Record leader joint positions as actions #pause],
+    [Observations: follower joint positions, 4 camera feeds #pause],
+    [Train ACT: predict future actions from observations #pause],
+    [Test: use policy with lowest validation loss #pause],
     [*Challenge: Compounding errors*]
   )
 ]
@@ -185,10 +176,17 @@
   == Action Chunking
   #list(
     tight: false,
-    [*Groups individual actions into units* for efficient storage and execution],
-    [Reduces the *effective horizon* of long trajectories],
-    [Every $k$ steps, the agent receives an observation and generates $k$ actions],
+    [*Groups individual actions into units* for efficient storage and execution #pause],
+    [Reduces the *effective horizon* of long trajectories #pause],
+    [Every $k$ steps, the agent receives an observation and generates $k$ actions #pause],
     [Mitigates issues with non-stationary demonstrations]
+  )
+]
+
+#polylux-slide[
+  == Action Chunking
+  #figure(
+    image("images/chunk.png", width: 70%),
   )
 ]
 
@@ -196,10 +194,17 @@
   == Temporal Ensemble
   #list(
     tight: false,
-    [Creates *overlapping action chunks*],
-    [Queries the policy at *every step* for precise and smoother motions],
-    [*Combines* predictions using a weighted average],
+    [Creates *overlapping action chunks* #pause],
+    [Queries the policy at *every step* for precise and smoother motions #pause],
+    [*Combines* predictions using a weighted average #pause],
     [No additional training cost, only extra inference-time computation],
+  )
+]
+
+#polylux-slide[
+  == Temporal Ensemble
+  #figure(
+    image("images/chunk.png", width: 70%),
   )
 ]
 
@@ -225,14 +230,21 @@
 ]
 
 #polylux-slide[
+  == Architecture
+  #figure(
+    image("images/arch.png", width: 110%),
+  )
+]
+
+#polylux-slide[
   == Implementation of ACT: Encoder
   #list(
     tight: false,
-    [CVAE encoder and decoder implemented with transformers],
-    [BERT-like transformer encoder used],
-    [Inputs: current joint positions and target action sequence],
-    [Outputs: mean and variance of "style variable" $z$],
-    [Encoder only used during training]
+    [CVAE encoder and decoder implemented with *transformers* #pause],
+    [*BERT-like transformer* encoder used #pause],
+    [Inputs: current joint positions and target action sequence #pause],
+    [Outputs: mean and variance of "style variable" $z$ #pause],
+    [Only used during training - $z$ set to 0 during test]
   )
 ]
 
@@ -251,11 +263,12 @@
   == Implementation of ACT: Decoder
   #list(
     tight: false,
-    [Transformer encoder synthesizes information],
-    [Transformer decoder generates action sequence],
+    [_Transformer_ encoder synthesizes information],
+    [_Transformer_ decoder generates action sequence],
     [L1 loss used for precise action sequence modeling]
   )
 ]
+
 
 
 #polylux-slide[
@@ -277,10 +290,10 @@
   == Challenges
   #list(
     tight: false,
-    [Requires ine-grained bimanual control],
-    [Perception challenges (e.g., transparency, low contrast)],
-    [Random initial placement of objects],
-    [Need for visual feedback to correct perturbations],
+    [Requires ine-grained bimanual control #pause],
+    [Perception challenges (e.g., transparency, low contrast) #pause],
+    [Random initial placement of objects #pause],
+    [Need for visual feedback to correct perturbations #pause],
     [Precise manipulation needed]
   )
 ]
@@ -289,11 +302,11 @@
   == Data Collection
   #list(
     tight: false,
-    [Collected demonstrations using ALOHA teleoperation for 6 real-world tasks],
-    [Each episode: 8-14 seconds (400-700 time steps at 50Hz)],
-    [50 demonstrations per task (100 for Thread Velcro)],
-    [Total: 10-20 minutes of data per task],
-    [Two types of demonstrations for simulated tasks: scripted policy and human demonstrations],
+    [Collected using ALOHA teleoperation for 6 real-world tasks #pause],
+    [Each episode: 8-14 seconds (400-700 time steps at 50Hz) #pause],
+    [50 demonstrations per task (100 for Thread Velcro) #pause],
+    [Total: 10-20 minutes of data per task #pause],
+    [Scripted policy / human demonstrations for simulated tasks],
     [Human demonstrations are stochastic:
       #list(
         tight: true,
@@ -314,7 +327,7 @@
         [BeT: Uses Transformers, no action chunking, separate visual encoder],
         [RT-1: Transformer-based, predicts one action from history],
         [VINN: Non-parametric, uses k-nearest neighbors]
-      )
+      ) #pause
     ],
     [ACT directly predicts continuous actions]
   )
@@ -322,16 +335,17 @@
 
 #polylux-slide[
   == Experiment Results
+  #pause
   #list(
     tight: false,
-    [ACT outperforms all prior methods in both simulated and real tasks],
-    [Simulated tasks: ACT shows 20%-59% higher success rates],
-    [Real-world tasks: Slide Ziploc (88%), Slot Battery (96%)],
+    [ACT outperforms all prior methods in both simulated and real tasks #pause],
+    [Simulated tasks: ACT shows 20%-59% higher success rates #pause],
+    [Real-world tasks: Slide Ziploc (88%), Slot Battery (96%) #pause],
     [ACT's performance in Thread Velcro was lower (20%) due to precision challenges]
   )
 ]
 #polylux-slide[
-  == Action Chunking and Temporal Ensembling
+  == Ablation: Action Chunking and Temporal Ensembling
   #list(
     tight: false,
     [Action chunking reduces compounding errors by dividing sequences into chunks],
@@ -342,23 +356,23 @@
 
 
 #polylux-slide[
-  == Training with CVAE
+  == Ablation: Training with CVAE
   #list(
     tight: false,
     [CVAE models noisy human demonstrations],
-    [Essential for learning from human data, removing CVAE objective significantly drops performance],
+    [Essential for learning from human data, removing CVAE objective significantly drops performance #pause],
     [Human data success rate drops from 35.3% to 2% without CVAE]
   )
 ]
 
 
 #polylux-slide[
-  == Is High-Frequency Necessary?
+  == Ablation: Is High-Frequency Necessary?
   #list(
     tight: false,
-    [User study shows higher performance at 50Hz compared to 5Hz],
-    [Tasks: threading zip cable tie and unstacking plastic cups],
-    [50Hz: faster and more accurate task completion],
+    [Human shows higher performance at 50Hz compared to 5Hz #pause],
+    [Tasks: threading zip cable tie and unstacking plastic cups #pause],
+    [50Hz: faster and more accurate task completion #pause],
     [50Hz reduces teleoperation time by 62% compared to 5Hz]
   )
 ]
@@ -378,45 +392,45 @@
 
 
 
-#polylux-slide[
-  == Experimental Results - Performance
-  #list(
-    tight: false,
-    [Success rates of 80-90%],
-    [Comparison with baselines:
-      #list(
-        tight: true,
-        [ACT significantly outperforms other methods],
-        [Effective in both simulated and real-world tasks]
-      )
-    ]
-  )
-]
+// #polylux-slide[
+//   == Experimental Results - Performance
+//   #list(
+//     tight: false,
+//     [Success rates of 80-90%],
+//     [Comparison with baselines:
+//       #list(
+//         tight: true,
+//         [ACT significantly outperforms other methods],
+//         [Effective in both simulated and real-world tasks]
+//       )
+//     ]
+//   )
+// ]
 
 
 
 
-#polylux-slide[
-  == Conclusion and Future Work
-  #list(
-    tight: false,
-    [*Conclusion*:
-      #list(
-        tight: true,
-        [Developed a low-cost, effective system for fine manipulation],
-        [Proposed a novel imitation learning algorithm (ACT)]
-      )
-    ],
-    [*Future Work*:
-      #list(
-        tight: true,
-        [Improving generalization to new tasks],
-        [Enhancing hardware precision],
-        [Exploring more complex manipulation tasks]
-      )
-    ]
-  )
-]
+// #polylux-slide[
+//   == Conclusion and Future Work
+//   #list(
+//     tight: false,
+//     [*Conclusion*:
+//       #list(
+//         tight: true,
+//         [Developed a low-cost, effective system for fine manipulation],
+//         [Proposed a novel imitation learning algorithm (ACT)]
+//       )
+//     ],
+//     [*Future Work*:
+//       #list(
+//         tight: true,
+//         [Improving generalization to new tasks],
+//         [Enhancing hardware precision],
+//         [Exploring more complex manipulation tasks]
+//       )
+//     ]
+//   )
+// ]
 
 
 // #polylux-slide[
