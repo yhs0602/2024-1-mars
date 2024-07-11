@@ -290,7 +290,7 @@
   == Challenges
   #list(
     tight: false,
-    [Requires ine-grained bimanual control #pause],
+    [Requires fine-grained bimanual control #pause],
     [Perception challenges (e.g., transparency, low contrast) #pause],
     [Random initial placement of objects #pause],
     [Need for visual feedback to correct perturbations #pause],
@@ -374,6 +374,13 @@
     [Tasks: threading zip cable tie and unstacking plastic cups #pause],
     [50Hz: faster and more accurate task completion #pause],
     [50Hz reduces teleoperation time by 62% compared to 5Hz]
+  )
+]
+
+#polylux-slide[
+  == Ablation graphs
+  #figure(
+    image("images/abl.png", width: 100%),
   )
 ]
 
