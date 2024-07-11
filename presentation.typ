@@ -43,353 +43,350 @@
   == Motivation
   #list(
     tight: false,
-    [Diffusion models well generate high-quality *rasterized* images #pause],
-    [However, designers also vastly use *vectorized* images in practice like SVG (Scalable Vector Graphics) #pause],
-    [Training diffusion model to generate vectorized images is theoritically possible but practically challenging],
+    [*Fine manipulation tasks* such as
+      #list(
+        tight: true,
+        [threading cable ties],
+        [slotting a battery],
+      )
+      #pause
+    ],
+    [*Requires*
+      #list(
+        tight: true,
+        [precision],
+        [careful coordination of contact forces],
+        [closed-loop visual feedback],  
+      )
+
+    ]
   )
 ]
 
 #polylux-slide[
-  == Challenges of training diffusion models for vectorized images
-  #list(
-    tight: false,
-    [Most labeled datasets are for rasterized images #pause],
-    [Vectorized images' data structure is more complex (hierarchical and variable-lengthed) than rasterized images']
-  )
-
-]
-
-#polylux-slide[
-  == Baselines
-  #enum(
-    tight: false,
-    [Generate a rasterized image with a pretrained diffusion model#pause],
-    [Convert the rasterized image to a vectorized image using a vectorization algorithm: *LIVE algorithm*]
-  )
-  #pause
+  == Low cost and imprecise hardware for fine manipulation tasks
   #block(
   fill: color.purple.lighten(80%),
   inset: 20pt,
   radius: 20%,
   width: 100%,
   [
-    #heading[Challenges]
+    #heading[Suggestion]
     #v(10pt)
-    - Diffusion Models often generate *too complex* rasterized images to be vectorized
-    - Automated conversion *loses details*
+     *Low-cost system* that performs end-to-end *imitation learning* directly from real demonstrations, collected with a custom teleoperation interface
   ]
   )
 ]
 
 #polylux-slide[
-  == VectorFusion
+  == Challenges in Imitation Learning
+    #list(
+    tight: false,
+    [*Errors* in the policy can compound over time #pause],
+    [Human demonstrations can be *non-stationary*]
+  )
+]
+
+#polylux-slide[
+  == Introduction
+  #list(
+    tight: true,
+    [Fine manipulation tasks require *precision and coordination* #pause],
+    [Current systems are *expensive and complex* #pause],
+    [Goal: Develop a low-cost, effective system for bimanual manipulation #pause],
+    [Key contributions:
+      #list(
+        tight: true,
+        [Low-cost hardware setup],
+        [Novel imitation learning algorithm (ACT)],
+        [Successful demonstration on various tasks]
+      )
+    ]
+  )
+]
+
+#polylux-slide[
+  == System Design - Low-cost hardware
   #list(
     tight: false,
-    [Differentiable vector graphics renderer #pause],
-    [Score Distillation Sampling #pause],
-    [SVG-Specific regularization]
+    [ViperX 6-DoF robot arms],
+    [3D printed components],
+    [Cost: <\$20k]
   )
 ]
 
-#polylux-slide[
-  == Background: Vector representation and rendering pipeline
-  ```svg
-    <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-    </svg> 
-  ```
-  #pause
-  #set align(center)
-  #image.decode(
-    "<svg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\"> <circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"black\" stroke-width=\"3\" fill=\"red\" /></svg>")
-]
 
 #polylux-slide[
-  == Background: SVG Path
-  - #text([`M x,y`: Move to the point (x, y)], fill: color.blue, weight: 700)
-  - `L x,y`: Draw a line to the point (x, y)
-  - `H x`: Draw a horizontal line to x
-  - `V y`: Draw a vertical line to y
-  - #text([`C x1, y1, x2, y2, x, y`: Draw a cubic Bezier curve], fill: color.blue, weight: 700)
-  - `Q x1, y1, x, y`: Draw a quadratic Bezier curve
-  - #text([`Z`: Close the path], fill: color.blue, weight: 700)
-]
-
-#polylux-slide[
-  == Background: SVG Path
-  ```svg
-    <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 80 C 40 10, 160 10, 190 80" stroke="black" fill="transparent"/>
-    </svg> 
-  ```
-  #pause
-  #set align(center)
-  #image.decode(
-    "<svg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M10 80 C 40 10, 160 10, 190 80\" stroke=\"black\" fill=\"transparent\"/></svg>"
-  )
-]
-
-#polylux-slide[
-  == Vector Grapchic Parameterization
-  #box(width: 100%, height: 87%,
- columns(2, gutter: 0pt)[
-   #set par(justify: true)
-  //  #figure(
-  //   image("images/svg_param.png", height: 100%),
-  //  )
-   #colbreak()
-   - $s$: number of segments
-   - $n$: number of paths to add
-  //  #figure(
-  //   image("images/gradient.svg", height: 100%),
-  //  )
- ]
-)
-]
-
-#polylux-slide[
-  == Background: Diffusion Models Training
-  - $cal(L)_("DDPM")(phi.alt, mono(x)) = EE_(t, epsilon.alt) [w(t)||epsilon.alt_phi.alt (alpha_t mono(x) + sigma_t epsilon.alt) - epsilon.alt||^2_2]$ #footnote([$alpha_t = sqrt(1-beta_t)$, $sigma_t = sqrt(beta_t)$]) #pause
-  #place(
-    top + left,
-    dx: 243pt,
-    dy: 30pt,
-    rect(
-      stroke: color.red + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 47pt,
-    )
-  )
-
-  - #text([$w(t)$: Sampling weight (usually evenly set to 1) #pause], fill: color.red )
-  #place(
-    top + left,
-    dx: 299pt,
-    dy: 30pt,
-    rect(
-      stroke: color.blue + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 24pt,
-    )
-  )
-  - #text([$epsilon.alt_phi.alt$: Noise Prediction Model #pause], fill: color.blue )
-  #place(
-    top + left,
-    dx: 356pt,
-    dy: 30pt,
-    rect(
-      stroke: color.green + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 18pt,
-    )
-  )
-  #place(
-    top + left,
-    dx: 134pt,
-    dy: 30pt,
-    rect(
-      stroke: color.green + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 18pt,
-    )
-  )
-  - #text([$mono(x)$: Original data sample #pause], fill: color.green )
-  #place(
-    top + left,
-    dx: 424pt,
-    dy: 30pt,
-    rect(
-      stroke: color.purple + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 12pt,
-    )
-  )
-  #place(
-    top + left,
-    dx: 474pt,
-    dy: 30pt,
-    rect(
-      stroke: color.purple + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 12pt,
-    )
-  )
-  - #text([$epsilon.alt$: Random (Gaussian) noise  #pause], fill: color.purple )
-
-#place(
-    top + left,
-    dx: 330pt,
-    dy: 30pt,
-    rect(
-      stroke: color.orange + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 28pt,
-    )
-  )
-  #place(
-    top + left,
-    dx: 400pt,
-    dy: 30pt,
-    rect(
-      stroke: color.orange + 3pt,
-      radius: 40%,
-      height: 50pt,
-      width: 25pt,
-    )
-  )
-  - #text([$alpha_t$, $sigma_t$: Propotion of $mono(x)$ and $epsilon.alt$], fill: color.orange)
-
-]
-
-#polylux-slide[
-  == Background: Diffusion Models Sampling
-  + Sample $mono(x)_t$ from a prior.
-  + Predict noise $epsilon.alt_phi.alt (mono(x)_t)$.
-  + Compute $hat(mono(x))$.
-
-    $hat(mono(x)) &= (mono(x)_t - sigma_t epsilon.alt_phi.alt (mono(x)_t))/alpha_t$
-
-  + Compute $mono(x)_(t-1)$ and feed to the next step.
-    
-    $mono(x)_(t-1) = alpha_(t-1)hat(mono(x))+sigma_(t-1)epsilon.alt_phi.alt (mono(x)_t)$
-]
-
-#polylux-slide[
-  == Background: Classifier Free Guidance
-  $hat(epsilon.alt)_phi.alt (mono(x), y) = (1 + omega) * epsilon.alt_phi.alt (mono(x), y) - omega * epsilon.alt_phi.alt (mono(x))$
-
+  == System Design - Design principles
   #list(
     tight: false,
-    [Generate both conditional and unconditional prediction for the noise. $epsilon.alt_phi.alt (mono(x), y)$ and $epsilon.alt_phi.alt (mono(x))$ #pause],
-    [Combine them with a weight $omega$ #pause],
-    [This enhances the model's ability to generate images with the desired class.]
+    [Versatile],
+    [User-friendly],
+    [Repairable],
+    [Easy-to-build]
+  )  
+]
+
+
+#polylux-slide[
+  == System Design - Design principles - Teleoperation setup
+  #list(
+    tight: false,
+    [Joint-space mapping for control],
+    [High-frequency control (50Hz)],
+    [3D printed “see-through” fingers, gripping tape]
   )
 ]
 
 #polylux-slide[
-  == Score Distillation Sampling
-  $cal(L)_("SDS") = EE_(t, epsilon.alt) [sigma_t / alpha_t w(t) KL(q(mono(x)_t|g(theta);y, t)|| p_phi.alt (mono(x)_t; y, t))]$ #pause
-  - $p_phi.alt$ is a *frozen* noise prediction model
-  - $q$ is a unimodal gaussian centered at a learned image $g(theta)$
-  - The larger $sigma_t / alpha_t$, the more the model prediction is important
-  #pause
-  $nabla_theta cal(L)_"SDS" = EE_(t, epsilon.alt) [w(t) (hat(epsilon.alt)_t (mono(x)_t; y, t) - epsilon.alt)(partial mono(x))/(partial theta) ]$
-]
-
-#polylux-slide[
-  #set align(center+horizon)
-  == Method
-]
-
-#polylux-slide[
-  == Baseline
-  + Sample an image using a pretrained diffusion model. #pause
-  + Automatically convert the image to an SVG using the LIVE algorithm. #pause
-  #block(
-  fill: color.purple.lighten(80%),
-  inset: 15pt,
-  radius: 20%,
-  width: 100%,
-  [
-    Provide "minimal flat 2d vector icon. lineal color. on a white background. trending on artstation" as a prompt.
-  ]
-  )
-  #pause
-  #block(
-  fill: color.orange.lighten(80%),
-  inset: 15pt,
-  radius: 20%,
-  width: 100%,
-  [
-    *Rejection Sampling*\
-    Sample $K=4$ images, select best by CLIP ViT-B/16 score
-  ]
+  == Joint space mapping for control
+  - Directly maps "Leader" joint angles to "Follower" joint angles
+  - Solves IK failing problem
+  #figure(
+     image("images/robots.png", width: 85%), 
   )
 ]
 
 #polylux-slide[
-  == VectorFusion
-  + Initialize a parameter ${p_1, p_2, ..., p_k}$ #pause
-  + Repeat the following: #pause
-    + DiffVg renders a 600 #sym.times 600 image using the parameters #pause
-    + Augment the image (perspective transformation, 512 #sym.times 512 crop) #pause
-    + Map the image to the latent space #pause
-    + Compute $mono(z)_t = alpha_t mono(z) + sigma_t epsilon.alt$ #pause
-    + Remove the noise using the noise prediction model #pause
-    + Update the parameters using SDS loss
+  == Imitation Learning Algorithm
+  #list(
+    tight: false,
+    [*Challenges*:
+      #list(
+        tight: true,
+        [Compounding errors in policy],
+        [Non-stationary human demonstrations]
+      )
+    ],
+    [*Solution: Action Chunking with Transformers (ACT)*:
+      #list(
+        tight: true,
+        [Predicts sequences of actions (chunks)],
+        [Reduces effective horizon of tasks],
+        [Uses temporal ensembling for smoothness]
+      )
+    ]
+  )
 ]
 
 #polylux-slide[
-  == VectorFusion: Details
-  - Sample $t$ from $t tilde.basic Uniform(50, 950)$
-  - Use fp16 precision
-    - Use fp32 precision for $(partial mono(z)) / (partial mono(x)_"aug")$ for stability
-  - Apply self intersection regularizer loss also #footnote([$D_1=II(arrow(A B)dot arrow(B C))$, $D_2 = (arrow(A B) dot arrow(C D))/(||arrow(A B)||||arrow(C D)||)$])
-    $
-    cal(L)_"Xing" = D_1 (ReLU(-D_2) + (1-D_1)(ReLU(D_2)))
-    $
-  - Reinitialize low opacity or shrinked paths
+  == Training ACT on a New Task
+  #list(
+    tight: false,
+    [Record leader joint positions as actions],
+    [Observations: follower joint positions, 4 camera feeds],
+    [Train ACT: predict future actions from observations],
+    [Test: use policy with lowest validation loss],
+    [*Challenge: Compounding errors*]
+  )
+]
+
+#polylux-slide[
+  == Action Chunking
+  #list(
+    tight: false,
+    [*Groups individual actions into units* for efficient storage and execution],
+    [Reduces the *effective horizon* of long trajectories],
+    [Every $k$ steps, the agent receives an observation and generates $k$ actions],
+    [Mitigates issues with non-stationary demonstrations]
+  )
+]
+
+#polylux-slide[
+  == Temporal Ensemble
+  #list(
+    tight: false,
+    [Creates *overlapping action chunks*],
+    [Queries the policy at *every step* for precise and smoother motions],
+    [*Combines* predictions using a weighted average],
+    [No additional training cost, only extra inference-time computation],
+  )
+]
+
+#polylux-slide[
+  == Modeling Human Data
+  #list(
+    tight: false,
+    [Human demonstrations are *noisy and inconsistent* #pause],
+    [*Different* trajectories can be used for the same observation #pause],
+    [Human actions are more *stochastic* where precision matters less #pause],
+    [Policy must *focus on high precision* areas]
+  )
+]
+
+#polylux-slide[
+  == Conditional Variational Autoencoder (CVAE)
+  #list(
+    tight: false,
+    [Train action chunking policy as a generative model #pause],
+    [Only decoder (policy) used in deployment #pause],
+    [Maximize log-likelihood of demonstration action chunks],
+  )
+]
+
+#polylux-slide[
+  == Implementation of ACT: Encoder
+  #list(
+    tight: false,
+    [CVAE encoder and decoder implemented with transformers],
+    [BERT-like transformer encoder used],
+    [Inputs: current joint positions and target action sequence],
+    [Outputs: mean and variance of "style variable" $z$],
+    [Encoder only used during training]
+  )
+]
+
+#polylux-slide[
+  == Implementation of ACT: Decoder
+  #list(
+    tight: false,
+    [Predicts next $k$ actions],
+    [Inputs: current observations and $z$],
+    [Observations: 4 RGB images and joint positions of 2 robot arms],
+    [ResNet18 used for image processing],
+  )
+]
+
+#polylux-slide[
+  == Implementation of ACT: Decoder
+  #list(
+    tight: false,
+    [Transformer encoder synthesizes information],
+    [Transformer decoder generates action sequence],
+    [L1 loss used for precise action sequence modeling]
+  )
 ]
 
 
 #polylux-slide[
-  == VectorFusion: Architecture
-//   #figure(
-//   image("images/architecture.png", width: 100%),
-//   caption: [
-//     VectorFusion architecture
-//   ]
+  == Experiment Tasks
+  #list(
+    tight: true,
+    [Slide Ziploc: Grasp and open ziploc bag slider],
+    [Slot Battery: Insert battery into remote controller slot],
+    [Open Cup: Open lid of small condiment cup],
+    [Thread Velcro: Insert velcro cable tie into loop],
+    [Prep Tape: Cut and hang tape on box edge],
+    [Put On Shoe: Put shoe on mannequin foot and secure velcro strap],
+    [Transfer Cube (sim): Transfer red cube to other arm],
+    [Bimanual Insertion (sim): Insert peg into socket in mid-air]
+  )
+]
+
+#polylux-slide[
+  == Challenges
+  #list(
+    tight: false,
+    [Requires ine-grained bimanual control],
+    [Perception challenges (e.g., transparency, low contrast)],
+    [Random initial placement of objects],
+    [Need for visual feedback to correct perturbations],
+    [Precise manipulation needed]
+  )
+]
+
+#polylux-slide[
+  == Data Collection
+  #list(
+    tight: false,
+    [Collected demonstrations using ALOHA teleoperation for 6 real-world tasks],
+    [Each episode: 8-14 seconds (400-700 time steps at 50Hz)],
+    [50 demonstrations per task (100 for Thread Velcro)],
+    [Total: 10-20 minutes of data per task],
+    [Two types of demonstrations for simulated tasks: scripted policy and human demonstrations],
+    [Human demonstrations are stochastic:
+      #list(
+        tight: true,
+        [Mid-air handover example: position varies each time],
+        [Policy must learn dynamic adjustments, not memorization]
+      )
+    ]
+  )
+]
+#polylux-slide[
+  == Experiment Comparison
+  #list(
+    tight: false,
+    [Compared ACT with four methods:
+      #list(
+        tight: true,
+        [BC-ConvMLP: Simple baseline with convolutional network],
+        [BeT: Uses Transformers, no action chunking, separate visual encoder],
+        [RT-1: Transformer-based, predicts one action from history],
+        [VINN: Non-parametric, uses k-nearest neighbors]
+      )
+    ],
+    [ACT directly predicts continuous actions]
+  )
+]
+
+#polylux-slide[
+  == Experiment Results
+  #list(
+    tight: false,
+    [ACT outperforms all prior methods in both simulated and real tasks],
+    [Simulated tasks: ACT shows 20%-59% higher success rates],
+    [Real-world tasks: Slide Ziploc (88%), Slot Battery (96%)],
+    [ACT's performance in Thread Velcro was lower (20%) due to precision challenges]
+  )
+]
+
+
+#polylux-slide[
+  == Experimental Results - Performance
+  #list(
+    tight: false,
+    [Success rates of 80-90%],
+    [Comparison with baselines:
+      #list(
+        tight: true,
+        [ACT significantly outperforms other methods],
+        [Effective in both simulated and real-world tasks]
+      )
+    ]
+  )
+]
+
+
+
+
+#polylux-slide[
+  == Conclusion and Future Work
+  #list(
+    tight: false,
+    [*Conclusion*:
+      #list(
+        tight: true,
+        [Developed a low-cost, effective system for fine manipulation],
+        [Proposed a novel imitation learning algorithm (ACT)]
+      )
+    ],
+    [*Future Work*:
+      #list(
+        tight: true,
+        [Improving generalization to new tasks],
+        [Enhancing hardware precision],
+        [Exploring more complex manipulation tasks]
+      )
+    ]
+  )
+]
+
+
+// #polylux-slide[
+//   == Evaluation
+//   #box(width: 100%, height: 87%,
+//  columns(2, gutter: 0pt)[
+//    #set par(justify: true)
+//   //  #figure(
+//   //   image("images/eval.png", width: 100%),
+//   //  )
+//    #colbreak()
+//    - CLIPDraw _performed best_, but *qualitative results are poor*
+//    - Therefore, also use OpenCLIP score
+//    - Effect of rejection sampling $tilde$ caption consistency
+//  ]
 // )
-]
-
-#polylux-slide[
-  == Evaluation
-  #block(
-  fill: color.orange.lighten(80%),
-  inset: 15pt,
-  radius: 20%,
-  width: 100%,
-  [
-    *No test dataset available for vector graphics*\
-    Therefore, use CLIP as an evaluation metric
-  ]
-  )
-  #pause
-  #block(
-  fill: color.purple.lighten(80%),
-  inset: 15pt,
-  radius: 20%,
-  width: 100%,
-  [
-    *R-Precision*\
-    For 128 SVGs, assign the captions by the CLIP score and check if it was the correct caption. Get the fraction of correct captions.
-  ]
-  ) 
-  #pause
-  - Used rejection sampling ($K$ in the table)
-]
-
-#polylux-slide[
-  == Evaluation
-  #box(width: 100%, height: 87%,
- columns(2, gutter: 0pt)[
-   #set par(justify: true)
-  //  #figure(
-  //   image("images/eval.png", width: 100%),
-  //  )
-   #colbreak()
-   - CLIPDraw _performed best_, but *qualitative results are poor*
-   - Therefore, also use OpenCLIP score
-   - Effect of rejection sampling $tilde$ caption consistency
- ]
-)
 //   #table(
 //   columns:(auto, 1fr, 1fr), 
 //   table.vline(x: 1, start: 0),
@@ -402,38 +399,38 @@
 //  [kcc-husk-vision-drqn-final], [X], [O],
 //  [kcc-husk-bimodal-drqn-final], [O], [O],
 //)
-]
+// ]
 
-#polylux-slide[
-  == Qualitative Results
-//   #figure(
-//   image("images/results.png", width: 100%),
-// //   #table(
-// //   columns:(auto, 1fr, 1fr), 
-// //   table.vline(x: 1, start: 0),
-// //   table.hline(y: 1, start: 0),
-// //   inset:(10pt),
-// //   fill:color.yellow.lighten(85%),
-// //   table.header[][Multimodal][Recurrent],
-// //  [kcc-husk-vision-dqn], [X], [X],
-// //  [kcc-husk-bimodal-dqn-final], [O], [X],
-// //  [kcc-husk-vision-drqn-final], [X], [O],
-// //  [kcc-husk-bimodal-drqn-final], [O], [O],
-// )
-]
+// #polylux-slide[
+//   == Qualitative Results
+// //   #figure(
+// //   image("images/results.png", width: 100%),
+// // //   #table(
+// // //   columns:(auto, 1fr, 1fr), 
+// // //   table.vline(x: 1, start: 0),
+// // //   table.hline(y: 1, start: 0),
+// // //   inset:(10pt),
+// // //   fill:color.yellow.lighten(85%),
+// // //   table.header[][Multimodal][Recurrent],
+// // //  [kcc-husk-vision-dqn], [X], [X],
+// // //  [kcc-husk-bimodal-dqn-final], [O], [X],
+// // //  [kcc-husk-vision-drqn-final], [X], [O],
+// // //  [kcc-husk-bimodal-drqn-final], [O], [O],
+// // )
+// ]
 
-#polylux-slide[
-  == Discussion
-  - Utilizes pretrained diffusion models *without captioned SVG datasets*
-  - Effectively shows the *distillation of generative models* compared to contrastive models #pause
-  \
-  - Computationally more *expensive* than CLIP-based approaches
-  - *Limited* by the quality and biases of the pretrained diffusion model
-]
+// #polylux-slide[
+//   == Discussion
+//   - Utilizes pretrained diffusion models *without captioned SVG datasets*
+//   - Effectively shows the *distillation of generative models* compared to contrastive models #pause
+//   \
+//   - Computationally more *expensive* than CLIP-based approaches
+//   - *Limited* by the quality and biases of the pretrained diffusion model
+// ]
 
-#polylux-slide[
-  == References
-  - DiffVG
-  - LIVE
-  - VectorFusion
-]
+// #polylux-slide[
+//   == References
+//   - DiffVG
+//   - LIVE
+//   - VectorFusion
+// ]
