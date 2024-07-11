@@ -330,6 +330,52 @@
     [ACT's performance in Thread Velcro was lower (20%) due to precision challenges]
   )
 ]
+#polylux-slide[
+  == Action Chunking and Temporal Ensembling
+  #list(
+    tight: false,
+    [Action chunking reduces compounding errors by dividing sequences into chunks],
+    [Performance improves with increasing chunk size, best at k = 100],
+    [Temporal ensembling further improves performance by averaging predictions]
+  )
+]
+
+
+#polylux-slide[
+  == Training with CVAE
+  #list(
+    tight: false,
+    [CVAE models noisy human demonstrations],
+    [Essential for learning from human data, removing CVAE objective significantly drops performance],
+    [Human data success rate drops from 35.3% to 2% without CVAE]
+  )
+]
+
+
+#polylux-slide[
+  == Is High-Frequency Necessary?
+  #list(
+    tight: false,
+    [User study shows higher performance at 50Hz compared to 5Hz],
+    [Tasks: threading zip cable tie and unstacking plastic cups],
+    [50Hz: faster and more accurate task completion],
+    [50Hz reduces teleoperation time by 62% compared to 5Hz]
+  )
+]
+
+#polylux-slide[
+  == Limitations and Conclusion
+  #list(
+    tight: false,
+    [Presented a low-cost system for fine manipulation],
+    [Components: ALOHA teleoperation system and ACT imitation learning algorithm],
+    [Enables learning fine manipulation skills in real-world],
+    [Examples: Opening a translucent condiment cup, slotting a battery (80-90% success rate, ~10 min demonstrations)],
+    [Limitations: Tasks beyond current capabilities, e.g., buttoning a dress shirt],
+    [Hope: Important step and accessible resource for advancing fine-grained robotic manipulation]
+  )
+]
+
 
 
 #polylux-slide[
