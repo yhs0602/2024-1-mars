@@ -232,8 +232,9 @@
 #polylux-slide[
   == Architecture
   #figure(
-    image("images/arch.png", width: 110%),
+    image("images/arch.png", width: 100%),
   )
+  - typo: synthesizes images -> information
 ]
 
 #polylux-slide[
@@ -266,6 +267,34 @@
     [_Transformer_ encoder synthesizes information],
     [_Transformer_ decoder generates action sequence],
     [L1 loss used for precise action sequence modeling]
+  )
+]
+
+#polylux-slide[
+  == Model architecutre: Training I
+  #figure(
+    image("images/1_training_1.png", width: 100%),
+  )
+]
+
+#polylux-slide[
+  == Model architecutre: Training II
+  #figure(
+    image("images/2_training_2.png", width: 100%),
+  )
+]
+
+#polylux-slide[
+  == Model architecutre: Training III
+  #figure(
+    image("images/3_training_3.png", width: 100%),
+  )
+]
+
+#polylux-slide[
+  == Model architecutre: Testing
+  #figure(
+    image("images/4_testing.png", width: 95%),
   )
 ]
 
@@ -347,6 +376,14 @@
     [ACT's performance in Thread Velcro was lower (20%) due to precision challenges]
   )
 ]
+
+#polylux-slide[
+  == Experiment Results
+  #figure(
+    image("images/result.png", width: 95%),
+  )
+]
+
 #polylux-slide[
   == Ablation: Action Chunking and Temporal Ensembling
   #list(
