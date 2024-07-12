@@ -307,15 +307,18 @@
     [50 demonstrations per task (100 for Thread Velcro) #pause],
     [Total: 10-20 minutes of data per task #pause],
     [Scripted policy / human demonstrations for simulated tasks],
-    [Human demonstrations are stochastic:
-      #list(
-        tight: true,
-        [Mid-air handover example: position varies each time],
-        [Policy must learn dynamic adjustments, not memorization]
-      )
-    ]
   )
 ]
+
+#polylux-slide[
+  == Human demonstrations are stochastic
+  #list(
+    tight: false,
+    [Mid-air handover example: position varies each time #pause],
+    [Policy must learn dynamic adjustments, not memorization]
+  )
+]
+
 #polylux-slide[
   == Experiment Comparison
   #list(
